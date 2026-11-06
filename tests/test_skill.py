@@ -9,8 +9,6 @@ import sys
 import tempfile
 from pathlib import Path
 
-import yaml
-
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "skills" / "question-first-skill" / "SKILL.md"
 README = ROOT / "README.md"
@@ -81,9 +79,11 @@ def main():
     check_plan("test_clear_plan", CLEAR_PLAN)
     check("test_clear_plan_asked_zero",
           count_questions(CLEAR_PLAN.read_text()) == 0)
-    ci = yaml.safe_load(CI.read_text())
+    ci = CI.read_text()
     check("test_ci_valid",
-          ci["jobs"]["test"]["steps"][-1]["run"] == "python3 tests/test_skill.py")
+          "python3 tests/test_skill.py" in ci
+          and "actions/checkout@v4" in ci
+          and "runs-on: ubuntu-latest" in ci)
 
     # The walkthrough sample app is real, runnable code.
     with tempfile.TemporaryDirectory() as tmp:
